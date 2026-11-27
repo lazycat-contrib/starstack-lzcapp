@@ -85,8 +85,8 @@ services:
       - /lzcapp/var:/data
     environment:
       - STARSTACK_HOME=/data
-      - STARSTACK_ADMIN_USER=admin
-      - "STARSTACK_ADMIN_PASSWORD={{ .U.admin_password | quote | trimPrefix (printf `%c` 34) | trimSuffix (printf `%c` 34) }}"
-      - "STARSTACK_GITHUB_CLIENT_ID={{ .U.github_client_id | default `` | quote | trimPrefix (printf `%c` 34) | trimSuffix (printf `%c` 34) }}"
+      - "STARSTACK_ADMIN_USER={{ .U.admin_username | default `` | quote | trimPrefix (printf `%c` 34) | trimSuffix (printf `%c` 34) }}"
+      - "STARSTACK_ADMIN_PASSWORD={{ .U.admin_password | default `` | quote | trimPrefix (printf `%c` 34) | trimSuffix (printf `%c` 34) }}"
+      - "STARSTACK_GITHUB_CLIENT_ID={{ .U.github_client_id | default `Ov23li6mQmiBb5SuLY1T` | quote | trimPrefix (printf `%c` 34) | trimSuffix (printf `%c` 34) }}"
       - STARSTACK_SECURE_COOKIE=1
       - STARSTACK_MCP_HOSTS={{ .S.AppDomain }}

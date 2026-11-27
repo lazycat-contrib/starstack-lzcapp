@@ -1,20 +1,28 @@
 params:
+  - id: admin_username
+    type: string
+    name: Initial administrator username
+    description: Optional. Fill in both administrator fields to initialize automatically, or create the account after opening StarStack.
+    optional: true
   - id: admin_password
     type: secret
-    name: Initial admin password
-    description: Password for the initial StarStack admin account. Only used for a new installation.
-    default_value: "$random(len=24)"
-    optional: false
+    name: Initial administrator password
+    description: Optional. Use 8 to 1024 bytes and fill in the administrator username as well.
+    optional: true
   - id: github_client_id
     type: string
     name: GitHub device flow client ID
-    description: Optional public client ID of a GitHub OAuth app with device flow enabled. Users may also connect with a personal token.
+    description: Use the bundled public Client ID or replace it with your own GitHub OAuth App's Client ID.
+    default_value: "Ov23li6mQmiBb5SuLY1T"
     optional: true
 locales:
   zh:
+    admin_username:
+      name: 初始管理员用户名
+      description: 可与密码一起填写，以便自动初始化。两项均可留空，首次打开星栈时再创建账号。
     admin_password:
       name: 初始管理员密码
-      description: 首次登录使用 admin 和此密码，仅初始化新数据库时生效。
+      description: 可选，长度为 8 至 1024 字节。填写时请同时填写初始管理员用户名。
     github_client_id:
       name: GitHub 设备授权客户端 ID
-      description: 可选。填写已启用设备授权的 GitHub OAuth App 的 Client ID，也可在星栈内按账号填写个人令牌。
+      description: 已填入星栈的公开 Client ID。也可换成自己的 GitHub OAuth App Client ID。
