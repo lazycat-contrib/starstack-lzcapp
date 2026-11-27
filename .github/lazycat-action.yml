@@ -1,0 +1,58 @@
+version: 1
+project:
+  root: .
+  build_config: lzc-build.yml
+  package_file: package.yml
+  output: dist/starstack.lpk
+  target_arch: amd64
+update:
+  strategy: publish
+  allow_downgrade: false
+  version_source:
+    type: image
+    image: starstack
+release:
+  use_github_release_notes: true
+  github_repository: ca-x/starstack
+  store_changelog_format: plain
+  changelog_template: "{{if .ReleaseNotes}}{{.ReleaseNotes}}{{else}}更新至 {{.Version}}。{{end}}"
+build:
+  toolchains: []
+  run_buildscript: false
+images:
+  - id: starstack
+    target: service
+    service: starstack
+    source: ghcr.io/ca-x/starstack
+    channel: stable
+    tag_regex: '^v?[0-9]+\.[0-9]+\.[0-9]+$'
+    delivery:
+      mode: lazycat
+stores:
+  private:
+    enabled: true
+    name: 星栈
+    skip_if_version_exists: true
+  official:
+    enabled: true
+    skip_if_version_exists: true
+    create_if_missing: true
+    changelog_locales: [zh, en]
+    application:
+      language: zh
+      name: 星栈
+      brief: 用自然语言找回自己收藏的 GitHub 仓库
+      description: 同步 GitHub Stars，用自己的标签、备注和收藏时间筛选仓库。在本机下载模型后即可语义检索，也可使用远端模型。支持 Markdown 和 JSON 导出，以及通过 MCP 向自己的 AI 助手提供检索能力。
+      keywords: GitHub, 收藏, 语义检索, MCP
+      source: https://github.com/ca-x/starstack
+      source_author: ca-x
+      support_pc: true
+      support_mobile: true
+      screenshot_pc_files:
+        - screenshots/desktop-library.png
+        - screenshots/desktop-detail.png
+        - screenshots/desktop-statistics.png
+      screenshot_mobile_files:
+        - screenshots/mobile-library.png
+        - screenshots/mobile-detail.png
+        - screenshots/mobile-statistics.png

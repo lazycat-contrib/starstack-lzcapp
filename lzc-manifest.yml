@@ -1,0 +1,91 @@
+application:
+  subdomain: starstack
+  background_task: true
+  public_path:
+    - /mcp
+  upstreams:
+    - location: /
+      backend: http://starstack:8080/
+  injects:
+    - id: remember-login-request
+      on: request
+      auth_required: true
+      when: [/api/login]
+      do: |
+        if (!ctx.safe_uid || ctx.request.path !== "/api/login" || ctx.request.method !== "POST") return;
+        let login;
+        try { login = ctx.body.getJSON(); } catch { return; }
+        if (login && typeof login.username === "string" && typeof login.password === "string") {
+          ctx.flow.set("user", login.username);
+          ctx.flow.set("pass", login.password);
+        }
+    - id: remember-successful-login
+      on: response
+      auth_required: true
+      when: [/api/login]
+      do: |
+        if (!ctx.safe_uid || ctx.status !== 200 || !ctx.flow.get("pass")) return;
+        ctx.persist.set("starstack.username", ctx.flow.get("user"));
+        ctx.persist.set("starstack.password", ctx.flow.get("pass"));
+    - id: fill-own-login
+      on: browser
+      auth_required: true
+      when: [/login]
+      do:
+        - src: builtin://simple-inject-password
+          params:
+            user: { $persist: starstack.username }
+            password: { $persist: starstack.password }
+            userSelector: 'input[name="username"]'
+            passwordSelector: 'input[name="password"]'
+            autoSubmit: false
+    - id: open-save-chooser
+      on: browser
+      auth_required: true
+      when: ["/admin", "/"]
+      do:
+        - src: file:///lzcapp/pkg/content/lazycat-injects/lzc-file-chooser-inject.js
+          params:
+            fileBridgeRoot: /__lazycat_file_bridge
+    - id: lazycat-file-bridge
+      on: request
+      auth_required: true
+      when: ["/__lazycat_file_bridge/*"]
+      do: |
+        const domain = "{{ .S.AppDomain }}";
+        const box = domain.match(/^starstack\.([a-z0-9-]+\.heiyu\.space)$/i);
+        const prefix = "/__lazycat_file_bridge/";
+        const path = ctx.request.path;
+        if (!ctx.safe_uid || !box || ctx.headers.get("Sec-Fetch-Site") !== "same-origin") {
+          ctx.response.send(403, "Open the file picker from StarStack.");
+          return;
+        }
+        if (!["GET", "HEAD", "PUT"].includes(ctx.request.method)) {
+          ctx.response.send(405, "Unsupported file operation.");
+          return;
+        }
+        if (!path.startsWith(prefix) || /[\\?#]|%(?:00|2e|2f|5c|25)/i.test(path)
+          || path.split("/").some(p => p === "." || p === "..")) {
+          ctx.response.send(400, "Invalid file path.");
+          return;
+        }
+        ctx.headers.del("Origin");
+        ctx.headers.del("Referer");
+        ctx.headers.del("Authorization");
+        ctx.proxy.to("https://file." + box[1], {
+          path: "/files/home/" + path.slice(prefix.length),
+          query: "", use_target_host: true, timeout_ms: 120000, on_fail: "error"
+        });
+services:
+  starstack:
+    image: ghcr.io/ca-x/starstack:v0.2.0
+    run_as: "10001:10001"
+    binds:
+      - /lzcapp/var:/data
+    environment:
+      - STARSTACK_HOME=/data
+      - STARSTACK_ADMIN_USER=admin
+      - "STARSTACK_ADMIN_PASSWORD={{ .U.admin_password | quote | trimPrefix (printf `%c` 34) | trimSuffix (printf `%c` 34) }}"
+      - "STARSTACK_GITHUB_CLIENT_ID={{ .U.github_client_id | default `` | quote | trimPrefix (printf `%c` 34) | trimSuffix (printf `%c` 34) }}"
+      - STARSTACK_SECURE_COOKIE=1
+      - STARSTACK_MCP_HOSTS={{ .S.AppDomain }}
