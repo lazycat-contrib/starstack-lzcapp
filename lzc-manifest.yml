@@ -34,8 +34,8 @@ application:
       do:
         - src: builtin://simple-inject-password
           params:
-            user: { $persist: starstack.username }
-            password: { $persist: starstack.password }
+            user: {$persist: starstack.username}
+            password: {$persist: starstack.password}
             userSelector: 'input[name="username"]'
             passwordSelector: 'input[name="password"]'
             autoSubmit: false
@@ -78,7 +78,8 @@ application:
         });
 services:
   starstack:
-    image: ghcr.io/ca-x/starstack:v0.2.0
+    # upstream: ghcr.io/ca-x/starstack:v0.2.0
+    image: registry.lazycat.cloud/czyt/ca-x/starstack:ecdee01feeffe322
     run_as: "10001:10001"
     binds:
       - /lzcapp/var:/data
