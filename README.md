@@ -7,4 +7,12 @@
 3. 下载检索模型，然后同步收藏并建立索引。内置模型在微服上运行。聊天服务由管理员按需配置。
 4. 在星栈内创建个人 MCP 令牌，将应用域名下的 `/mcp` 和令牌填入助手。数据库、模型和索引保存在应用持久目录。
 
+## 配置 GitHub 设备授权
+
+1. 在 GitHub 打开 **Settings → Developer settings → OAuth Apps → New OAuth App**。填写 **Application name**，将 **Homepage URL** 和 **Redirect URI** 都填为应用主页，例如 `https://github.com/ca-x/starstack`。星栈通过设备码向 GitHub 查询授权结果，无需在懒猫配置回调路径。[创建 OAuth App](https://github.com/settings/applications/new)
+2. 取消勾选 **Allow wildcard matching**，勾选 **Enable Device Flow**。如果表单提供 **Expire user access tokens**，建议取消勾选。星栈目前尚未实现自动续期，令牌过期后需要重新授权。
+3. 注册后复制 **Client ID**，填入懒猫应用配置「GitHub 设备授权客户端 ID」。保存后打开星栈，在「同步与索引」发起设备授权，按提示在 GitHub 输入短码。设备授权只需要 Client ID。
+
+## 发布
+
 发布工作流每日检查上游稳定版本，将镜像复制到懒猫镜像仓库，构建版本化 LPK，并将同一份安装包发布到喵喵商店和提交官方审核。官方商店素材包含桌面、手机各三张实机界面截图。维护者可在 Actions 手动运行工作流。需要组织或仓库级 Actions Secrets `LZC_API_TOKEN`、`APPSTORE_URL`、`APPSTORE_TOKEN`。
