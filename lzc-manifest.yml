@@ -78,8 +78,8 @@ application:
         });
 services:
   starstack:
-    # upstream: ghcr.io/ca-x/starstack:v0.2.6
-    image: registry.lazycat.cloud/czyt/ca-x/starstack:1a3d8816cefa90ea
+    # upstream: ghcr.io/ca-x/starstack:v0.2.7
+    image: registry.lazycat.cloud/czyt/ca-x/starstack:a70421da9ba6ceb5
     run_as: "10001:10001"
     binds:
       - /lzcapp/var:/data
