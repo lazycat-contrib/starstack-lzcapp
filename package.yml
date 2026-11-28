@@ -1,5 +1,5 @@
 package: community.lazycat.app.starstack
-version: 0.2.9
+version: 0.2.10
 name: StarStack
 description: Search your GitHub stars by meaning and organize them with private tags and notes.
 homepage: https://github.com/ca-x/starstack
